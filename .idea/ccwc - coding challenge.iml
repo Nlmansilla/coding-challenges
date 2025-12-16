@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="WEB_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$/../CodingChallenges">
+      <sourceFolder url="file://$MODULE_DIR$/../CodingChallenges/./src" isTestSource="false" packagePrefix="Wc\" />
+      <sourceFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/src/." isTestSource="false" packagePrefix="nmansilla\" />
+      <sourceFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/vanilla/garden-cli/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../CodingChallenges/spec" isTestSource="true" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/clue/ndjson-react" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/composer" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/evenement/evenement" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/fidry/cpu-core-counter" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/friendsofphp/php-cs-fixer" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/phpstan/phpstan" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/psr/container" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/psr/event-dispatcher" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/psr/log" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/react/cache" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/react/child-process" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/react/dns" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/react/event-loop" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/react/promise" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/react/socket" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/react/stream" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/sebastian/diff" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/symfony/console" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/symfony/deprecation-contracts" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/symfony/event-dispatcher" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/symfony/event-dispatcher-contracts" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/symfony/filesystem" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/symfony/finder" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/symfony/options-resolver" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/symfony/polyfill-ctype" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/symfony/polyfill-intl-grapheme" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/symfony/polyfill-intl-normalizer" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/symfony/polyfill-mbstring" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/symfony/polyfill-php80" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/symfony/polyfill-php81" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/symfony/polyfill-php84" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/symfony/process" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/symfony/service-contracts" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/symfony/stopwatch" />
+      <excludeFolder url="file://$MODULE_DIR$/../CodingChallenges/WC.php/vendor/symfony/string" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>
