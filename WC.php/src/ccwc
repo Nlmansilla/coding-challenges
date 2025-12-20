@@ -1,0 +1,7 @@
+#!/usr/bin/env php
+<?php
+use Wc\Wc;
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+return Wc::main();

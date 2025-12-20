@@ -13,6 +13,8 @@ const LONG_MODE_LINES = 'lines';
 const MODE_STDIN = 'stdin';
 const MODE_FILES = 'files';
 
+$counts = [];
+
 $shortOpts = implode([
     MODE_CHARACTERS,
     MODE_BYTES,
@@ -34,9 +36,9 @@ $defaultOpts = [
 ];
 
 $lines = $bytes = $words = $chars = null;
-
-$args = getopt($shortOpts, $longOpts);
-$filepath = array_last($argv);
+$restIndex = 0;
+$args = getopt($shortOpts, $longOpts, $restIndex);
+$filepath = array_slice($_SERVER['argv'], $restIndex);
 
 $userOpts = [];
 
@@ -56,34 +58,19 @@ if (empty($userOpts)) {
 
 /**
  * @param string|null $filepath
+ * @param array $userOpts
  * @param int|null $lines
- * @param array <int,string> $userOpts
  * @param int|null $bytes
  * @param int|null $words
  * @param int|null $chars
  */
-function analyzeFile(?string $filepath, array $userOpts, ?int &$lines, ?int &$bytes, ?int &$words, ?int &$chars): void {
+function analyzeFile(?string $filepath, array $userOpts, ?int &$lines, ?int &$bytes, ?int &$words, ?int &$chars): array
+{
     $readContentFrom = hasStdinData() ? MODE_STDIN : MODE_FILES;
-
+    $localCount = getEmptyArray();
     $f = $readContentFrom === MODE_FILES ? fopen($filepath, 'r') : STDIN;
     $buffer = '';
-    $justCountBytes = false;
-    if(count($userOpts) === 1  && $userOpts[0] === 'c') {
-        $justCountBytes = true;
-    }
 
-    if (in_array('c', $userOpts)) {
-        if ($readContentFrom === MODE_FILES) {
-            $filesize = filesize($filepath);
-            $bytes = $filesize !== false ? $filesize : 0;
-        } else {
-            $bytes = 0;
-        }
-    }
-
-    if ($justCountBytes && $readContentFrom === MODE_FILES) {
-        return;
-    }
     while (!feof($f)) {
         $buffer = fread($f, 8192);
         foreach ($userOpts as $opt) {
@@ -98,9 +85,7 @@ function analyzeFile(?string $filepath, array $userOpts, ?int &$lines, ?int &$by
                     $chars += mb_strlen($buffer);
                     break;
                 case 'c':
-                    if ($readContentFrom === MODE_STDIN) {
                         $bytes += strlen($buffer);
-                    }
                     break;
             }
         }
@@ -111,6 +96,12 @@ function analyzeFile(?string $filepath, array $userOpts, ?int &$lines, ?int &$by
         $words += preg_match_all('/[\s]+/', $buffer);
         $chars += mb_strlen($buffer);
     }
+
+    $localCount[MODE_BYTES] = $bytes ?? 0;
+    $localCount[MODE_LINES] = $lines ?? 0;
+    $localCount[MODE_WORDS] = $words ?? 0;
+    $localCount[MODE_CHARACTERS] = $chars ?? 0;
+    return $localCount;
 }
 
 function hasStdinData(): bool {
@@ -123,10 +114,27 @@ function hasStdinData(): bool {
     return $result > 0;
 }
 
-function formatOutput(?int $bytes, ?int $words, ?int $chars, ?int $lines): void
+function formatOutput(array $counts): void
 {
-    echo implode(" ", array_filter([$bytes ?? null , $words ?? null, $chars ?? null, $lines ?? null])) . PHP_EOL;
+    $content = '';
+    foreach ($counts as $file => $count) {
+        $content .= implode(" ", $count) . " {$file}" . PHP_EOL;
+    }
+    echo $content;
 }
 
-analyzeFile($filepath, $userOpts, $lines, $bytes, $words, $chars);
-formatOutput($bytes, $words, $chars, $lines);
+foreach ($filepath as $file) {
+    $counts[$file] = analyzeFile($file, $userOpts, $lines, $bytes, $words, $chars);
+}
+
+formatOutput($counts);
+
+function getEmptyArray(): array
+{
+    return [
+        MODE_BYTES => 0,
+        MODE_WORDS => 0,
+        MODE_CHARACTERS => 0,
+        MODE_LINES => 0
+    ];
+}

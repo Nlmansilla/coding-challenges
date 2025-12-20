@@ -1,7 +1,8 @@
 services:
   php:
     build: .
+    container_name: ccwc
     volumes:
-      - ./src:/app
+      - .:/app
     stdin_open: true
     tty: true

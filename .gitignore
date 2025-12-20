@@ -2,4 +2,3 @@
 .php-cs-fixer.dist.php
 vendor
 .idea
-.phpunit.result.cache
