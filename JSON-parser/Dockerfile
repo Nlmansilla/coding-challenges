@@ -21,7 +21,7 @@ WORKDIR /app
 # Configuración de PHP para desarrollo
 RUN echo "display_errors = On" >> /usr/local/etc/php/conf.d/docker-php-dev.ini \
     && echo "error_reporting = E_ALL" >> /usr/local/etc/php/conf.d/docker-php-dev.ini \
-    && echo "memory_limit = 512M" >> /usr/local/etc/php/conf.d/docker-php-dev.ini \
+    && echo "memory_limit = 512M" >> /usr/local/etc/php/conf.d/docker-php-dev.ini
 #    && echo "opcache.enable = 1" >> /usr/local/etc/php/conf.d/docker-php-dev.ini \
 #    && echo "opcache.enable_cli = 1" >> /usr/local/etc/php/conf.d/docker-php-dev.ini \
 #    && echo "opcache.jit_buffer_size = 256M" >> /usr/local/etc/php/conf.d/docker-php-dev.ini \
