@@ -2,42 +2,21 @@
 
 namespace Nicolas\JsonParser;
 
-use Wc\Options;
-use Wc\UserOptions;
+use Exception;
 
 class OptionParser
 {
-    private static array $userOptions = [];
-    private static int $restIndex = 0;
-
-    public static function getUSerOptions(): UserOptions
+    /**
+     * @throws Exception
+     */
+    public static function parse(): string
     {
-        return new UserOptions(...self::parse());
-    }
+        $file = array_last($_SERVER['argv']);
 
-    public static function parse(): array
-    {
-        $args = getopt(
-            implode('',Options::getShortOptions())
-            , Options::getLongOptions(),
-            self::$restIndex
-        );
-        foreach ($args as $key => $value) {
-            self::$userOptions[] = match($key) {
-                Options::MODE_LINES->value, Options::MODE_LINES_LONG->value => Options::MODE_LINES,
-                Options::MODE_BYTES->value, Options::MODE_BYTES_LONG->value => Options::MODE_BYTES,
-                Options::MODE_WORDS->value, Options::MODE_WORDS_LONG->value => Options::MODE_WORDS,
-                Options::MODE_CHARACTERS->value, Options::MODE_CHARACTERS_LONG->value => Options::MODE_CHARACTERS,
-                default => null,
-            };
+        if (!is_readable($file)) {
+            throw new Exception('Unable to read: ' . $file);
         }
 
-        $files = array_slice($_SERVER['argv'], self::$restIndex);
-
-        return [
-            'modes' => array_unique(self::$userOptions, SORT_REGULAR),
-            'files' => empty($files) ? [STDIN] : $files,
-            'readFrom' => empty($files) ? Options::STDIN_MODE : Options::FILES_MODE
-        ];
+        return $file;
     }
 }

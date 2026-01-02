@@ -6,4 +6,4 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 $parser = new JsonParser;
 
-return $parser::main();
+return $parser->main();

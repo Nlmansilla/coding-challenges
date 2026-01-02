@@ -9,15 +9,15 @@ class Parser
     /**
      * @var array<Token> $tokens
      */
-    private array $tokens = [];
-
-    public function __construct(array $tokens){
-        $this->tokens = $tokens;
+    public array $tokens = [] {
+        set {
+            $this->tokens = $value;
+        }
     }
 
     private function advance(): void
     {
-        $this->currentTokenIndex ++;
+        $this->currentTokenIndex++;
     }
 
     private function current(): Token
@@ -28,18 +28,14 @@ class Parser
     /**
      * @return bool
      */
-    public  function parse(): bool
+    public function parse(): bool
     {
         if (empty($this->tokens)) {
             throw new \InvalidArgumentException('Invalid JSON object.');
         }
 
-        if ($this->tokens[0]->getType() !== TokenType::OPEN_CURLY_BRACE) {
-            throw new \InvalidArgumentException('Invalid JSON object. Expected { at position 0.');
-        } else {
-            $this->parseObject();
-            $this->expect(TokenType::EOF);
-        }
+        $this->parseObject();
+        $this->expect(TokenType::EOF);
 
         return true;
     }
@@ -47,20 +43,29 @@ class Parser
 
     private function parseObject(): void
     {
+        if ($this->current()->getType() === TokenType::OPEN_SQUARE_BRACKET) {
+            $this->parseArray();
+        }
+
+        if ($this->current()->getType() === TokenType::EOF) {
+            return;
+        }
+
         $this->expect(TokenType::OPEN_CURLY_BRACE);
 
-        while (count($this->tokens) > $this->currentTokenIndex) {
-            if ($this->current()->getType() === TokenType::CLOSE_CURLY_BRACE) {
-                $this->advance();
-                return;
-            }
+        if ($this->current()->getType() === TokenType::CLOSE_CURLY_BRACE) {
+            $this->advance();
+            return;
+        }
 
-//            match ($this->current()->getType()) {
-//                TokenType::STRING => $this->parsePair(),
-//                default => throw new \InvalidArgumentException('Only string keys supported for now')
-//            };
+        $this->parsePair();
+
+        while ($this->current()->getType() === TokenType::COMMA) {
+            $this->advance();
             $this->parsePair();
         }
+
+        $this->expect(TokenType::CLOSE_CURLY_BRACE);
     }
 
     private function parsePair(): void
@@ -68,17 +73,25 @@ class Parser
         $this->expect(TokenType::STRING);
         $this->expect(TokenType::COLON);
         $this->parseValue();
+    }
 
-        switch ($this->current()->getType() ):
-            case TokenType::CLOSE_CURLY_BRACE:
-                return;
-            case TokenType::COMMA:
-                $this->advance();
-                $this->parsePair();
-                break;
-            default:
-                throw new \InvalidArgumentException('Invalid JSON object.');
-        endswitch;
+    private function parseArray(): void
+    {
+        $this->expect(TokenType::OPEN_SQUARE_BRACKET);
+
+        if ($this->current()->getType() === TokenType::CLOSE_SQUARE_BRACKET) {
+            $this->advance();
+            return;
+        }
+
+        $this->parseValue();
+
+        while ($this->current()->getType() === TokenType::COMMA) {
+            $this->advance();
+            $this->parseValue();
+        }
+
+        $this->expect(TokenType::CLOSE_SQUARE_BRACKET);
     }
 
     private function parseValue(): void
@@ -91,20 +104,19 @@ class Parser
             TokenType::NULL => $this->advance(),
 
             TokenType::OPEN_CURLY_BRACE => $this->parseObject(),
-            TokenType::OPEN_SQUARE_BRACKET => throw new \InvalidArgumentException('Arrays are not supported yet'),
+            TokenType::OPEN_SQUARE_BRACKET => $this->parseArray(),
 
             default => throw new \InvalidArgumentException(
-                "Unexpected value {$this->current()->getType()->name}"
-            )
+                "Unexpected value {$this->current()->getType()->name}",
+            ),
         };
     }
 
     private function expect(TokenType $type): void
     {
         if ($this->current()->getType() !== $type) {
-            var_dump($this->current());
             throw new \InvalidArgumentException(
-                "Expected {$type->name}, got {$this->current()->getType()->name}"
+                "Expected {$type->name}, got {$this->current()->getType()->name} in token {$this->current()->getValue()} at position {$this->currentTokenIndex}",
             );
         }
         $this->advance();

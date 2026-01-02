@@ -6,14 +6,15 @@ readonly class Token
 {
     public function __construct(
         private TokenType $type,
-        private mixed     $value
-    ){
-    }
+        private mixed     $value,
+    ) {}
 
-    public function getType(): TokenType {
+    public function getType(): TokenType
+    {
         return $this->type;
     }
-    public function getValue(): mixed {
+    public function getValue(): mixed
+    {
         return $this->value;
     }
 }

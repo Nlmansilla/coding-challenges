@@ -9,6 +9,10 @@ class Lexer
     private int $line = 1;
 
     private string $input;
+
+    /**
+     * @var array<Token> $tokens
+     */
     private(set) array $tokens = [];
 
     private function next(): void
@@ -16,12 +20,16 @@ class Lexer
         $this->pos++;
     }
 
+    /**
+     * @param string $content
+     * @return Token[]
+     */
     public function tokenize(string $content): array
     {
         $this->input = $content;
         unset($content);
 
-        while($this->pos < strlen($this->input)) {
+        while ($this->pos < strlen($this->input)) {
             if (ctype_space($this->input[$this->pos])) {
 
                 if (preg_match('/\R/', $this->input[$this->pos])) {
@@ -32,7 +40,7 @@ class Lexer
                 continue;
             }
 
-            if (ctype_digit($this->input[$this->pos])) {
+            if (ctype_digit($this->input[$this->pos]) || $this->input[$this->pos] === '-') {
                 $number = $this->readNumber();
                 $this->addToken(TokenType::NUMBER, $number);
                 continue;
@@ -61,8 +69,8 @@ class Lexer
 
                 case '"':
                     $this->addToken(
-                        type:TokenType::STRING,
-                        value: $this->readString()
+                        type: TokenType::STRING,
+                        value: $this->readString(),
                     );
                     break;
 
@@ -103,7 +111,7 @@ class Lexer
     private function raiseError(): never
     {
         throw new \RuntimeException(
-            "Unexpected character '{$this->input[$this->pos]}' at line {$this->line} position {$this->pos}"
+            "Unexpected character '{$this->input[$this->pos]}' at line {$this->line} position {$this->pos}",
         );
     }
 
@@ -111,27 +119,64 @@ class Lexer
     {
         $this->tokens[] = new Token(
             type: $type,
-            value: $value
+            value: $value,
         );
     }
 
     private function readString(): string
     {
         $this->next();
-        $start = $this->pos;
+
+        $result = '';
         $length = strlen($this->input);
+
         while ($this->pos < $length) {
-            if ($this->input[$this->pos] === '"') {
-                $value = substr($this->input, $start, $this->pos - $start);
+            $char = $this->input[$this->pos];
+
+            if ($char === '"') {
                 $this->next();
-                return $value;
+                return $result;
             }
 
+            if (ord($char) < 0x20) {
+                throw new \RuntimeException(
+                    "Invalid control character in string at line {$this->line} position {$this->pos}",
+                );
+            }
+
+            if ($char === '\\') {
+                $this->next();
+
+                if ($this->pos >= $length) {
+                    throw new \RuntimeException("Unterminated escape sequence");
+                }
+
+                $escape = $this->input[$this->pos];
+
+                $result .= match ($escape) {
+                    '"', '\\', '/' => $escape,
+                    'b' => "\b",
+                    'f' => "\f",
+                    'n' => "\n",
+                    'r' => "\r",
+                    't' => "\t",
+                    'u' => $this->readUnicodeEscape(),
+                    default => throw new \RuntimeException(
+                        "Invalid escape sequence \\{$escape} at line {$this->line} position {$this->pos}",
+                    ),
+                };
+
+                $this->next();
+                continue;
+            }
+
+            $result .= $char;
             $this->next();
         }
 
-        throw new \RuntimeException("Unterminated string literal at line {$this->line} position {$this->pos}");
+        throw new \RuntimeException("Unterminated string literal at line {$this->line}");
     }
+
 
     private function readKeyword(string $expected): void
     {
@@ -149,14 +194,68 @@ class Lexer
     {
         $start = $this->pos;
         $length = strlen($this->input);
-        while ($this->pos < $length) {
-            if ( !ctype_digit($this->input[$this->pos]) ) {
-                return substr($this->input, $start, $this->pos - $start);
-            }
 
+        if ($this->input[$this->pos] === '-') {
             $this->next();
         }
 
-        throw new \RuntimeException("TODO: improve error message");
+        if ($this->input[$this->pos] === '0') {
+            $this->next();
+        } elseif (ctype_digit($this->input[$this->pos])) {
+            while ($this->pos < $length && ctype_digit($this->input[$this->pos])) {
+                $this->next();
+            }
+        } else {
+            throw new \RuntimeException("Invalid number at position {$this->pos}");
+        }
+
+        if ($this->pos < $length && $this->input[$this->pos] === '.') {
+            $this->next();
+
+            if ($this->pos >= $length || !ctype_digit($this->input[$this->pos])) {
+                throw new \RuntimeException("Invalid fractional part at position {$this->pos}");
+            }
+
+            while ($this->pos < $length && ctype_digit($this->input[$this->pos])) {
+                $this->next();
+            }
+        }
+
+        if ($this->pos < $length && ($this->input[$this->pos] === 'e' || $this->input[$this->pos] === 'E')) {
+            $this->next();
+
+            if ($this->pos < $length && ($this->input[$this->pos] === '+' || $this->input[$this->pos] === '-')) {
+                $this->next();
+            }
+
+            if ($this->pos >= $length || !ctype_digit($this->input[$this->pos])) {
+                throw new \RuntimeException("Invalid exponent at position {$this->pos}");
+            }
+
+            while ($this->pos < $length && ctype_digit($this->input[$this->pos])) {
+                $this->next();
+            }
+        }
+
+        return substr($this->input, $start, $this->pos - $start);
     }
+
+
+    private function readUnicodeEscape(): string
+    {
+        $hex = substr($this->input, $this->pos + 1, 4);
+
+        if (!preg_match('/^[0-9a-fA-F]{4}$/', $hex)) {
+            throw new \RuntimeException(
+                "Invalid unicode escape \\u{$hex} at line {$this->line} position {$this->pos}",
+            );
+        }
+
+        $this->pos += 4;
+
+        $codepoint = hexdec($hex);
+
+        return mb_convert_encoding(pack('n', $codepoint), 'UTF-8', 'UTF-16BE');
+    }
+
 }

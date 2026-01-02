@@ -2,28 +2,37 @@
 
 namespace Nicolas\JsonParser;
 
+use Exception;
+
 class JsonParser
 {
-    private static Lexer $lexer;
-    private static Parser $parser;
+    private readonly Lexer $lexer;
+    private Parser $parser;
 
     public function __construct()
     {
-        self::$lexer = new Lexer;
+        $this->lexer = new Lexer();
+        $this->parser = new Parser();
     }
 
-    static function main()
+    public function main(): int
     {
-        var_dump("hello world");
-        #$tokens = self::$lexer->tokenize('{"key":"value", "key2": {"key3": "value3"}, "key5": 102, "key6": [true], ["key-a":[1,2,3,4] }');
-        #$tokens = self::$lexer->tokenize(file_get_contents(__DIR__ . '/tests/step2/valid.json'));
-//        $tokens = self::$lexer->tokenize(file_get_contents(__DIR__ . '/tests/step3/valid.json'));
-        $tokens = self::$lexer->tokenize(file_get_contents(__DIR__ . '/tests/step4/valid.json'));
-        self::$parser = new Parser($tokens);
+        try {
+            $file = OptionParser::parse();
+            $content = file_get_contents($file);
 
-        $ast = self::$parser->parse();
+            if (empty($content)) {
+                throw new Exception('File is empty');
+            }
 
-        var_dump($tokens);
-        var_dump($ast);
+            $tokens = $this->lexer->tokenize($content);
+            $this->parser->tokens = $tokens;
+            $this->parser->parse();
+            echo sprintf("File %s contains a valid JSON\n", $file);
+            return 0;
+        } catch (Exception $e) {
+            echo sprintf("Error: %s\n", $e->getMessage());
+            return 1;
+        }
     }
 }
