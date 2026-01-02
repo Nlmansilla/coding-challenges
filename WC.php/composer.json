@@ -2,6 +2,7 @@
   "name": "nmansilla/cc_wc",
   "description": "wc (Coding Challenge 001)",
   "type": "project",
+  "php": "^8.5",
   "autoload": {
     "psr-4": {
       "Wc\\": "./src"
