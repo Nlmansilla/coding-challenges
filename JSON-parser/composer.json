@@ -1,0 +1,25 @@
+{
+    "name": "nicolas/json-parser",
+    "description": "JSON parser tool based on John Crickett coding challenges",
+    "type": "project",
+    "license": "WTFPL",
+    "php": "^8.5",
+    "autoload": {
+        "psr-4": {
+            "Nicolas\\JsonParser\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Nicolas",
+            "email": "nlmansilla89@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {},
+    "require-dev": {
+        "phpstan/phpstan": "^2.1",
+        "friendsofphp/php-cs-fixer": "^3.92",
+        "phpunit/phpunit": "^10.5"
+    }
+}

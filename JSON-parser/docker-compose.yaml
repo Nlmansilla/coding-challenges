@@ -1,0 +1,8 @@
+services:
+  php:
+    build: .
+    container_name: json-parser
+    volumes:
+      - .:/app
+    stdin_open: true
+    tty: true
